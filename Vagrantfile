@@ -1,6 +1,6 @@
 Vagrant.configure("2") do |config|
 	# Nome da box.  
-	config.vm.box = "centos"
+	config.vm.box = "centos-lamp"
 
 	# URL da box.
 	config.vm.box_url = "https://www.dropbox.com/s/qajiajhgbm1tt68/centos64-64.box?dl=1"

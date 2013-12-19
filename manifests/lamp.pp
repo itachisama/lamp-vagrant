@@ -74,6 +74,19 @@ class httpd {
 		    recurse => true
 		;
 	}
+
+    exec {
+		'yum-update':
+			command => '/usr/bin/yum -y update',
+			require => Exec["grap-epel"],
+            timeout => 0
+			;
+		"grap-epel":
+			command => "/bin/rpm -Uvh http://www.mirrorservice.org/sites/dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm",
+			creates => "/etc/yum.repos.d/epel.repo",
+			alias   => "grab-epel"
+			;
+	}
 }
 
 
@@ -88,6 +101,15 @@ class php {
 
     package { "php":
         ensure  => present,
+    }
+
+	package { "php-cli":
+        ensure  => present,
+    }
+
+    package { "php-mcrypt":
+        ensure  => present,
+        require => Exec["grab-epel"],
     }
 
     package { "php-common":
@@ -116,8 +138,8 @@ class php {
 
     package { "php-xml":
         ensure  => present,
-	require => Package["httpd"],
-	notify  => Service["httpd"]
+	    require => Package["httpd"],
+	    notify  => Service["httpd"]
     }
 
     package { "php-intl":
