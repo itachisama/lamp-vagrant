@@ -5,11 +5,37 @@ Vagrant.configure("2") do |config|
 	# URL da box.
 	config.vm.box_url = "https://www.dropbox.com/s/qajiajhgbm1tt68/centos64-64.box?dl=1"
  
-  # definimos pasta pasta do projeto
+  # definimos pasta do projeto
   sourcedir = "../lamp-development"
 
+  # definimos o arquivo de configuração
+  config_file = sourcedir + "/vagrant_config.yml" 
+
+  # Incluímos o módulo utilitário de ler arquivos de configuração
+  require 'yaml'
+
+  # Primeiro verificamos se o arquivo existe.
+  if File.exists? (config_file)
+    # lemos o arquivo de configuração
+    vconfig = YAML::load_file(config_file)
+  else
+    # Caso não exista, deixo as configurações como vazio.    
+    vconfig = {} 
+  end
+
+  # definimos local do script de ajustes finos
+  setupscript = "./scripts/setup.sh"
+
+  # Capturamos o endereço ip do arquivo de configurações. 
+  ip_host = vconfig['ip_host']
+
+  # Caso não exista, é usado um ip padrão.
+  if not ip_host
+    ip_host = "192.168.2.10"
+  end
+
   # definimos um ip para essa máquina (usando NAT aqui).
-  config.vm.network :private_network, ip: "192.168.2.10"
+  config.vm.network :private_network, ip: ip_host
 
   # Redirecionamos a porta 8000 do guest para 8000 do host(apache)
   config.vm.network :forwarded_port, guest: 8000, host: 8000
@@ -63,4 +89,23 @@ Vagrant.configure("2") do |config|
       # melhor logging do puppet na execução do vagrant, é bom pra debugar coisas
       puppet.options = "--verbose"
   end
+
+  # Após executar os módulos do puppet, chamo o script para ajustes finos de configuração
+  config.vm.provision "shell" do |s|
+
+    # Indico o path para o shell script    
+    s.path = setupscript
+
+    # Capturo o nome do host
+    host_name = vconfig['box_name']
+
+    # Verifico se o parâmetro box_name não está vazio
+    if not host_name
+      s.args = "epic.local.dev"
+    else
+      s.args = vconfig['box_name']
+    end
+
+  end
+
 end
