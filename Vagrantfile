@@ -48,7 +48,7 @@ Vagrant.configure("2") do |config|
   if Vagrant::Util::Platform.windows?
     config.vm.synced_folder sourcedir, "/var/www/html/dev", :mount_options => ["dmode=777","fmode=777"], :owner => "vagrant", :group => "vagrant"
   else
-    config.vm.synced_folder sourcedir, "/var/www/html/dev", :nfs => true, :nfs_version => 4
+    config.vm.synced_folder sourcedir, "/var/www/html/dev"
   end
 
   config.vm.provider :virtualbox do |vb|
@@ -60,14 +60,14 @@ Vagrant.configure("2") do |config|
     vb.gui = false
  
     # Colocando mais memoria e mudando o nome da maquina virtual
-    vb.customize ["modifyvm", :id, "--memory", 2048]
-    vb.customize ["modifyvm", :id, "--name", "epic.local.lamp.dev"]
+    #vb.customize ["modifyvm", :id, "--memory", 2048]
+    #vb.customize ["modifyvm", :id, "--name", "epic.local.lamp.dev"]
     
     #Adicionando mais capacidade de execução na cpu
-    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "90"]
+    #vb.customize ["modifyvm", :id, "--cpuexecutioncap", "90"]
 
     #Adicionando mais núcleos
-    vb.customize ["modifyvm", :id, "--cpus", 2]
+    #vb.customize ["modifyvm", :id, "--cpus", 2]
   end
 
     # desativa o SELinux(para evitar problemas com a porta 8000 do apache)
